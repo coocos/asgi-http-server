@@ -1,7 +1,7 @@
 """ASGI protocol server for HTTP 1.1"""
 import asyncio
 
-from tools import HttpRequest
+from asgi.tools import HttpRequest
 
 
 async def process_http_request(reader: asyncio.streams.StreamReader) -> HttpRequest:
