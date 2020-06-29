@@ -1,6 +1,7 @@
 import unittest
 
 from asgi.tools import HttpRequest
+from asgi.exceptions import HttpRequestParsingException
 
 
 class TestHttpRequest(unittest.TestCase):
@@ -21,3 +22,14 @@ class TestHttpRequest(unittest.TestCase):
             request.headers,
             {"user-agent": "curl/7.54.0", "host": "localhost:8000", "accept": "*/*"},
         )
+
+    def test_that_parsing_invalid_request_raises_exception(self):
+
+        with self.assertRaises(HttpRequestParsingException):
+            request = HttpRequest.from_raw_request(
+                """
+                HTTP/1.1\r\n
+                Host 8000\r\n
+                \r\n
+                """
+            )

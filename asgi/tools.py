@@ -2,6 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List
 
+from asgi.exceptions import HttpRequestParsingException
+
 
 @dataclass
 class HttpRequest:
@@ -16,11 +18,13 @@ class HttpRequest:
     @classmethod
     def from_raw_request(cls, raw: str) -> HttpRequest:
         """Constructs HttpRequest from string containing an entire HTTP request"""
-
-        lines = raw.split("\r\n")
-        method, path, protocol = lines[0].split()
-        headers = HttpRequest._parse_headers(lines[1:])
-        return HttpRequest(method, path, headers)
+        try:
+            lines = raw.split("\r\n")
+            method, path, protocol = lines[0].split()
+            headers = HttpRequest._parse_headers(lines[1:])
+            return HttpRequest(method, path, headers)
+        except Exception as err:
+            raise HttpRequestParsingException(f"Failed to parse {raw}")
 
     @staticmethod
     def _parse_headers(raw_headers: List[str]) -> Dict[str, str]:
