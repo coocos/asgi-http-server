@@ -28,6 +28,7 @@ class HttpRequest:
         headers: Dict[str, str] = {}
         for header in raw_headers:
             if header.strip():
-                name, value = [part.strip() for part in header.split(":")]
+                name = header[: header.find(":")].strip()
+                value = header[header.find(":") + 1 :].strip()
                 headers[name.lower()] = value
         return headers

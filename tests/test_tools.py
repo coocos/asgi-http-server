@@ -10,6 +10,7 @@ class TestHttpRequest(unittest.TestCase):
             """
             GET / HTTP/1.1\r\n
             User-Agent: curl/7.54.0\r\n
+            Host: localhost:8000\r\n
             Accept: */*\r\n
             \r\n
             """
@@ -17,5 +18,6 @@ class TestHttpRequest(unittest.TestCase):
         self.assertEqual(request.method, "GET")
         self.assertEqual(request.path, "/")
         self.assertDictEqual(
-            request.headers, {"user-agent": "curl/7.54.0", "accept": "*/*"}
+            request.headers,
+            {"user-agent": "curl/7.54.0", "host": "localhost:8000", "accept": "*/*"},
         )
