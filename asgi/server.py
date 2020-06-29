@@ -15,12 +15,10 @@ async def process_http_request(reader: asyncio.streams.StreamReader) -> HttpRequ
     return HttpRequest.from_raw_request(buf.decode("utf-8"))
 
 
-# FIXME: Add type hints
 async def handle_connection(
     reader: asyncio.streams.StreamReader, writer: asyncio.streams.StreamWriter
 ) -> None:
 
-    # FIXME: This should read until the entire HTTP request has been consumed
     request = await process_http_request(reader)
     print(request)
 
@@ -29,11 +27,12 @@ async def handle_connection(
     writer.close()
 
 
-async def serve():
-    server = await asyncio.start_server(handle_connection, "127.0.0.1", 8000)
+if __name__ == "__main__":
 
-    async with server:
-        await server.serve_forever()
+    async def serve():
+        server = await asyncio.start_server(handle_connection, "127.0.0.1", 8000)
 
+        async with server:
+            await server.serve_forever()
 
-asyncio.run(serve())
+    asyncio.run(serve())
