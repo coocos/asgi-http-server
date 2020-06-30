@@ -1,25 +1,34 @@
 """ASGI protocol server for HTTP 1.1"""
 import asyncio
 
-from asgi.tools import HttpRequest
+from asgi.http import HttpRequest
 
 
-async def process_http_request(reader: asyncio.streams.StreamReader) -> HttpRequest:
+async def read_http_request(reader: asyncio.streams.StreamReader) -> HttpRequest:
     """
-    Reads until a complete HTTP request can be parsed and returns the request
+    Reads from connection until a complete HTTP request can be parsed and returns the request
     """
     buf = bytearray()
-    while not buf.endswith(b"\r\n\r\n"):
-        data = await reader.read(64)
-        buf += data
-    return HttpRequest.from_raw_request(buf.decode("utf-8"))
+    # Read until all headers have been read
+    while not b"\r\n\r\n" in buf:
+        buf += await reader.read(64)
+    request = HttpRequest.from_raw_request(buf.decode("utf-8"))
+
+    # Read body if it's present
+    if "content-length" in request.headers:
+        body_start = buf.find(b"\r\n\r\n") + 4
+        while len(buf[body_start:]) < int(request.headers["content-length"]):
+            buf += await reader.read(64)
+        request = HttpRequest.from_raw_request(buf.decode("utf-8"))
+
+    return request
 
 
 async def handle_connection(
     reader: asyncio.streams.StreamReader, writer: asyncio.streams.StreamWriter
 ) -> None:
 
-    request = await process_http_request(reader)
+    request = await read_http_request(reader)
     print(request)
 
     writer.write(b"Thanks")

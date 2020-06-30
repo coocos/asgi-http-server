@@ -11,9 +11,10 @@ class HttpRequest:
 
     # FIXME: Use enum or type this better
     method: str
-    # FIXME: Or create a proper URL object?
+    # FIXME: Create a proper URL object?
     path: str
     headers: Dict[str, str]
+    body: str = ""
 
     @classmethod
     def from_raw_request(cls, raw: str) -> HttpRequest:
@@ -22,7 +23,11 @@ class HttpRequest:
             lines = raw.split("\r\n")
             method, path, protocol = lines[0].split()
             headers = HttpRequest._parse_headers(lines[1:])
-            return HttpRequest(method, path, headers)
+            if "content-length" in headers:
+                body = HttpRequest._parse_body(lines[-1])
+            else:
+                body = ""
+            return HttpRequest(method, path, headers, body)
         except Exception as err:
             raise HttpRequestParsingException(f"Failed to parse {raw}")
 
@@ -31,8 +36,17 @@ class HttpRequest:
         """Parses headers to a dictionary from a list of strings"""
         headers: Dict[str, str] = {}
         for header in raw_headers:
-            if header.strip():
-                name = header[: header.find(":")].strip()
-                value = header[header.find(":") + 1 :].strip()
-                headers[name.lower()] = value
+            # FIXME: The body should not be passed to this function
+            if not header.strip():
+                break
+            name = header[: header.find(":")].strip()
+            value = header[header.find(":") + 1 :].strip()
+            headers[name.lower()] = value
+
         return headers
+
+    @staticmethod
+    def _parse_body(body: str) -> str:
+        """Parses body"""
+        # TODO: Implement JSON parsing
+        return body
