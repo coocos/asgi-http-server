@@ -1,6 +1,6 @@
 import unittest
 
-from asgi.http import HttpRequest
+from asgi.http import HttpRequest, HttpResponse
 from asgi.exceptions import HttpRequestParsingException
 
 
@@ -56,3 +56,19 @@ class TestHttpRequest(unittest.TestCase):
             request = HttpRequest.from_raw_request(
                 ("HTTP/1.1\r\n" "Host 8000\r\n" "\r\n")
             )
+
+
+class TestHttpResponse(unittest.TestCase):
+    def test_constructing_http_response(self):
+
+        response = HttpResponse(200, {"server": "asgi-from-scratch/0.1"})
+        self.assertEqual(response.status, 200)
+        self.assertDictEqual(response.headers, {"server": "asgi-from-scratch/0.1"})
+
+    def test_encoding_http_response_to_bytes(self):
+
+        response = HttpResponse(200, {"server": "asgi-from-scratch/0.1"})
+        self.assertEqual(
+            response.encode(),
+            (b"HTTP/1.0 200 OK\r\n" b"server: asgi-from-scratch/0.1\r\n" b"\r\n"),
+        )

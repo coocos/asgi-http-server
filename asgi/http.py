@@ -1,8 +1,11 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List
 
 from asgi.exceptions import HttpRequestParsingException
+
+
+STATUS_CODES = {200: "OK", 400: "Bad Request", 500: "Internal Server Error"}
 
 
 @dataclass
@@ -50,3 +53,22 @@ class HttpRequest:
         """Parses body"""
         # TODO: Implement JSON parsing
         return body
+
+
+@dataclass
+class HttpResponse:
+    """HTTP response object"""
+
+    status: int = 200
+    headers: Dict[str, str] = field(default_factory=dict)
+
+    def encode(self) -> bytes:
+        """Returns HTTP response as raw bytes"""
+        headers = "\r\n".join(
+            f"{header}: {value}" for header, value in self.headers.items()
+        )
+        return (
+            f"HTTP/1.0 {self.status} {STATUS_CODES[self.status]}\r\n"
+            f"{headers}\r\n"
+            "\r\n"
+        ).encode("utf-8")
