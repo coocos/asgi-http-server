@@ -7,7 +7,7 @@ from asgi.exceptions import HttpRequestParsingException
 class TestHttpRequest(unittest.TestCase):
     def test_constructing_request_from_raw_string(self):
 
-        request = HttpRequest.from_raw_request(
+        request = HttpRequest.deserialize(
             (
                 "GET / HTTP/1.1\r\n"
                 "User-Agent: curl/7.54.0\r\n"
@@ -24,7 +24,7 @@ class TestHttpRequest(unittest.TestCase):
         )
 
     def test_constructing_request_with_body(self):
-        request = HttpRequest.from_raw_request(
+        request = HttpRequest.deserialize(
             (
                 "POST / HTTP/1.1\r\n"
                 "User-Agent: curl/7.54.0\r\n"
@@ -53,9 +53,7 @@ class TestHttpRequest(unittest.TestCase):
     def test_that_parsing_invalid_request_raises_exception(self):
 
         with self.assertRaises(HttpRequestParsingException):
-            request = HttpRequest.from_raw_request(
-                ("HTTP/1.1\r\n" "Host 8000\r\n" "\r\n")
-            )
+            request = HttpRequest.deserialize(("HTTP/1.1\r\n" "Host 8000\r\n" "\r\n"))
 
 
 class TestHttpResponse(unittest.TestCase):
@@ -69,6 +67,6 @@ class TestHttpResponse(unittest.TestCase):
 
         response = HttpResponse(200, {"server": "asgi-from-scratch/0.1"})
         self.assertEqual(
-            response.encode(),
+            response.serialize(),
             (b"HTTP/1.0 200 OK\r\n" b"server: asgi-from-scratch/0.1\r\n" b"\r\n"),
         )

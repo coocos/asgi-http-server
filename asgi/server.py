@@ -12,7 +12,7 @@ async def read_http_request(reader: asyncio.streams.StreamReader) -> HttpRequest
     # Read until all headers have been read
     while not b"\r\n\r\n" in buf:
         buf += await reader.read(64)
-    request = HttpRequest.from_raw_request(buf.decode("utf-8"))
+    request = HttpRequest.deserialize(buf.decode("utf-8"))
 
     # Read body if it's present
     if "content-length" in request.headers:
@@ -20,9 +20,17 @@ async def read_http_request(reader: asyncio.streams.StreamReader) -> HttpRequest
         while len(buf[body_start:]) < int(request.headers["content-length"]):
             buf += await reader.read(64)
         # FIXME: Constructing the request twice is nasty - refactor reading the body
-        request = HttpRequest.from_raw_request(buf.decode("utf-8"))
+        request = HttpRequest.deserialize(buf.decode("utf-8"))
 
     return request
+
+
+async def write_http_response(writer: asyncio.streams.StreamWriter) -> None:
+
+    response = HttpResponse()
+    writer.write(response.serialize())
+    await writer.drain()
+    writer.close()
 
 
 async def handle_connection(
@@ -31,11 +39,7 @@ async def handle_connection(
 
     request = await read_http_request(reader)
     print(request)
-
-    response = HttpResponse()
-    writer.write(response.encode())
-    await writer.drain()
-    writer.close()
+    await write_http_response(writer)
 
 
 async def serve():

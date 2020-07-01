@@ -20,7 +20,7 @@ class HttpRequest:
     body: str = ""
 
     @classmethod
-    def from_raw_request(cls, raw: str) -> HttpRequest:
+    def deserialize(cls, raw: str) -> HttpRequest:
         """Constructs HttpRequest from string containing an entire HTTP request"""
         try:
             raw_headers, raw_body = raw.split("\r\n\r\n")
@@ -60,7 +60,7 @@ class HttpResponse:
     status: int = 200
     headers: Dict[str, str] = field(default_factory=dict)
 
-    def encode(self) -> bytes:
+    def serialize(self) -> bytes:
         """Returns HTTP response as raw bytes"""
         headers = "\r\n".join(
             f"{header}: {value}" for header, value in self.headers.items()
