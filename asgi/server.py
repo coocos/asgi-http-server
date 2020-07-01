@@ -38,12 +38,13 @@ async def handle_connection(
     writer.close()
 
 
+async def serve():
+    server = await asyncio.start_server(handle_connection, "127.0.0.1", 8000)
+
+    async with server:
+        await server.serve_forever()
+
+
 if __name__ == "__main__":
-
-    async def serve():
-        server = await asyncio.start_server(handle_connection, "127.0.0.1", 8000)
-
-        async with server:
-            await server.serve_forever()
 
     asyncio.run(serve())
