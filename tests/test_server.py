@@ -1,8 +1,7 @@
 import asyncio
 import unittest
 
-from asgi.server import read_http_request
-from asgi.http import HttpRequest
+from asgi.http import HttpRequest, HttpResponse
 
 
 class StreamReader:
@@ -17,21 +16,20 @@ class StreamReader:
         return next_bytes
 
 
-class TestHttpRequestProcessing(unittest.TestCase):
-    def test_processing_http_request_with_no_body(self):
+class TestHttpRequest(unittest.TestCase):
+    def test_deserializing_http_request_without_body(self):
 
-        request = (
-            b"GET / HTTP/1.1\r\n"
-            b"Host: localhost:8000\r\n"
-            b"User-Agent: Archer/1.0.0\r\n"
-            b"Accept-Encoding: gzip/deflate\r\n"
-            b"\r\n"
+        raw = (
+            "GET / HTTP/1.1\r\n"
+            "Host: localhost:8000\r\n"
+            "User-Agent: Archer/1.0.0\r\n"
+            "Accept-Encoding: gzip/deflate\r\n"
+            "\r\n"
         )
 
-        process = read_http_request(StreamReader(request))
-        result = asyncio.run(process)
+        request = HttpRequest.deserialize(raw)
         self.assertEqual(
-            result,
+            request,
             HttpRequest(
                 "GET",
                 "/",
@@ -43,24 +41,23 @@ class TestHttpRequestProcessing(unittest.TestCase):
             ),
         )
 
-    def test_processing_http_request_with_body(self):
+    def test_deserializing_http_request_with_body(self):
 
-        request = (
-            b"POST /api/v1/ HTTP/1.1\r\n"
-            b"Host: localhost:8000\r\n"
-            b"User-Agent: Archer/1.0.0\r\n"
-            b"Accept-Encoding: gzip, deflate\r\n"
-            b"Connection: keep-alive\r\n"
-            b"Content-Type: application/json\r\n"
-            b"Content-Length: 47\r\n"
-            b"\r\n"
-            b'{"first_name": "Paul", "last_name": "Atreides"}'
+        raw = (
+            "POST /api/v1/ HTTP/1.1\r\n"
+            "Host: localhost:8000\r\n"
+            "User-Agent: Archer/1.0.0\r\n"
+            "Accept-Encoding: gzip, deflate\r\n"
+            "Connection: keep-alive\r\n"
+            "Content-Type: application/json\r\n"
+            "Content-Length: 47\r\n"
+            "\r\n"
+            '{"first_name": "Paul", "last_name": "Atreides"}'
         )
 
-        process = read_http_request(StreamReader(request))
-        result = asyncio.run(process)
+        request = HttpRequest.deserialize(raw)
         self.assertEqual(
-            result,
+            request,
             HttpRequest(
                 "POST",
                 "/api/v1/",
@@ -75,3 +72,11 @@ class TestHttpRequestProcessing(unittest.TestCase):
                 '{"first_name": "Paul", "last_name": "Atreides"}',
             ),
         )
+
+
+class TestHttpResponse(unittest.TestCase):
+    def test_serializing_http_response_without_body(self):
+
+        expected = b"HTTP/1.0 200 OK\r\n" b"content-type: text/plain\r\n" b"\r\n"
+        response = HttpResponse(200, {"content-type": "text/plain"})
+        self.assertEqual(response.serialize(), expected)
