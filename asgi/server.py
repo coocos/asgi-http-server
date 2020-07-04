@@ -1,27 +1,40 @@
 """ASGI protocol server for HTTP 1.0"""
 import asyncio
+import importlib
 
 from asgi.http import AsgiHttpRequest, AsgiHttpResponse
-from asgi.example import app
-from asgi import exceptions
+from asgi import cli
 
 
-async def handle_request(
-    reader: asyncio.streams.StreamReader, writer: asyncio.streams.StreamWriter
-) -> None:
-    """Handles a single HTTP request-response pair"""
+def use_application(app):
+    """Uses passed ASGI application to handle HTTP requests"""
 
-    request = AsgiHttpRequest(reader)
-    response = AsgiHttpResponse(writer)
-    scope = await request.scope()
-    # FIXME: You should be able to pass the application here so that you can mock it in tests etc
-    await app(scope, request.read, response.write)
-    await response.send()
+    async def handle_request(
+        reader: asyncio.streams.StreamReader, writer: asyncio.streams.StreamWriter
+    ) -> None:
+        """Handles a single HTTP request-response pair"""
+
+        request = AsgiHttpRequest(reader)
+        response = AsgiHttpResponse(writer)
+        scope = await request.scope()
+        await app(scope, request.read, response.write)
+        await response.send()
+
+    return handle_request
+
+
+def import_application(path: str):
+    """Imports ASGI application coroutine and returns it"""
+    module_path, app_name = path.split(":")
+    module = importlib.import_module(module_path)
+    return getattr(module, app_name)
 
 
 async def serve() -> None:
     """Starts HTTP server"""
-    server = await asyncio.start_server(handle_request, "127.0.0.1", 8000)
+    args = cli.parse_cli_arguments()
+    app = import_application(args.application)
+    server = await asyncio.start_server(use_application(app), "127.0.0.1", args.port)
 
     async with server:
         await server.serve_forever()

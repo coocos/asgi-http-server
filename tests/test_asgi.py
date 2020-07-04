@@ -116,18 +116,21 @@ class TestAsgiHttpResponse(unittest.TestCase):
         )
 
     def test_writing_headers_and_body(self):
-        messages = [{
-            "type": "http.response.start",
-            "status": 200,
-            "headers": [
-                [b"content-type", b"application/json"],
-                [b"content-length", b"44"],
-            ],
-        },{
-            "type" : "http.response.body",
-            "body": b'{"first_name":"paul","last_name":"atreides"}',
-            "more_body": False
-        }]
+        messages = [
+            {
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [
+                    [b"content-type", b"application/json"],
+                    [b"content-length", b"44"],
+                ],
+            },
+            {
+                "type": "http.response.body",
+                "body": b'{"first_name":"paul","last_name":"atreides"}',
+                "more_body": False,
+            },
+        ]
         writer = StreamWriter()
         response = AsgiHttpResponse(writer)
         for message in messages:

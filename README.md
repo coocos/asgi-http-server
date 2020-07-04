@@ -55,7 +55,7 @@ Note that the HTTP server is very, very barebones and is only meant to serve as 
 To run the protocol server:
 
 ```shell
-python3 -m asgi.server
+python3 -m asgi.server asgi.example:app
 ```
 
 To run tests:

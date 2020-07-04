@@ -8,8 +8,14 @@ async def app(scope, receive, send):
             "status": 200,
             "headers": [
                 [b"content-type", b"application/json"],
-                [b"content-length", b"44"]
+                [b"content-length", b"44"],
             ],
         }
     )
-    await send({"type": "http.response.body", "body": b'{"first_name":"paul","last_name":"atreides"}', "more_body": False})
+    await send(
+        {
+            "type": "http.response.body",
+            "body": b'{"first_name":"paul","last_name":"atreides"}',
+            "more_body": False,
+        }
+    )
