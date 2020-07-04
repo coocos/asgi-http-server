@@ -9,7 +9,7 @@ class TestHttpRequest(unittest.TestCase):
 
         request = HttpRequest.deserialize(
             (
-                "GET / HTTP/1.1\r\n"
+                "GET / HTTP/1.0\r\n"
                 "User-Agent: curl/7.54.0\r\n"
                 "Host: localhost:8000\r\n"
                 "Accept: */*\r\n"
@@ -26,7 +26,7 @@ class TestHttpRequest(unittest.TestCase):
     def test_deserializing_http_request_with_body(self):
         request = HttpRequest.deserialize(
             (
-                "POST / HTTP/1.1\r\n"
+                "POST / HTTP/1.0\r\n"
                 "User-Agent: curl/7.54.0\r\n"
                 "Host: localhost:8000\r\n"
                 "Content-Type: application/json\r\n"
@@ -55,7 +55,7 @@ class TestHttpRequest(unittest.TestCase):
     def test_that_parsing_invalid_request_raises_exception(self):
 
         with self.assertRaises(exceptions.HttpRequestParsingException):
-            request = HttpRequest.deserialize(("HTTP/1.1\r\n" "Host 8000\r\n" "\r\n"))
+            request = HttpRequest.deserialize(("HTTP/1.0\r\n" "Host 8000\r\n" "\r\n"))
 
 
 class TestHttpResponse(unittest.TestCase):

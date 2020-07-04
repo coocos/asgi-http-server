@@ -40,7 +40,7 @@ class TestAsgiHttpRequest(unittest.TestCase):
     def test_reading_scope(self):
 
         raw_request = (
-            b"GET /api/v1/ HTTP/1.1\r\n"
+            b"GET /api/v1/ HTTP/1.0\r\n"
             b"User-Agent: curl/7.54.0\r\n"
             b"Host: localhost:8000\r\n"
             b"\r\n"
@@ -66,7 +66,7 @@ class TestAsgiHttpRequest(unittest.TestCase):
 
     def test_reading_entire_request(self):
         raw_request = (
-            b"POST /api/v1/ HTTP/1.1\r\n"
+            b"POST /api/v1/ HTTP/1.0\r\n"
             b"User-Agent: curl/7.54.0\r\n"
             b"Host: localhost:8000\r\n"
             b"Content-Type: application/json\r\n"
