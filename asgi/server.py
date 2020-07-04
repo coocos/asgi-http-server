@@ -1,10 +1,7 @@
 """ASGI protocol server for HTTP 1.0"""
 import asyncio
-from dataclasses import dataclass, field
-from typing import Optional, Dict
 
-from dataclasses import dataclass
-from asgi.http import HttpResponse, AsgiHttpRequest, AsgiHttpResponse
+from asgi.http import AsgiHttpRequest, AsgiHttpResponse
 from asgi.example import app
 from asgi import exceptions
 
