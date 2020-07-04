@@ -1,11 +1,11 @@
 import unittest
 
 from asgi.http import HttpRequest, HttpResponse
-from asgi.exceptions import HttpRequestParsingException
+from asgi import exceptions
 
 
 class TestHttpRequest(unittest.TestCase):
-    def test_constructing_request_from_raw_string(self):
+    def test_deserializing_http_request_without_body(self):
 
         request = HttpRequest.deserialize(
             (
@@ -23,7 +23,7 @@ class TestHttpRequest(unittest.TestCase):
             {"user-agent": "curl/7.54.0", "host": "localhost:8000", "accept": "*/*"},
         )
 
-    def test_constructing_request_with_body(self):
+    def test_deserializing_http_request_with_body(self):
         request = HttpRequest.deserialize(
             (
                 "POST / HTTP/1.1\r\n"
@@ -31,9 +31,9 @@ class TestHttpRequest(unittest.TestCase):
                 "Host: localhost:8000\r\n"
                 "Content-Type: application/json\r\n"
                 "Accept: */*\r\n"
-                "Content-Length: 8\r\n"
+                "Content-Length: 47\r\n"
                 "\r\n"
-                '{"id":1}'
+                '{"first_name": "Paul", "last_name": "Atreides"}'
             )
         )
         self.assertEqual(request.method, "POST")
@@ -45,28 +45,27 @@ class TestHttpRequest(unittest.TestCase):
                 "host": "localhost:8000",
                 "accept": "*/*",
                 "content-type": "application/json",
-                "content-length": "8",
+                "content-length": "47",
             },
         )
-        self.assertEqual(request.body, '{"id":1}')
+        self.assertEqual(
+            request.body, '{"first_name": "Paul", "last_name": "Atreides"}'
+        )
 
     def test_that_parsing_invalid_request_raises_exception(self):
 
-        with self.assertRaises(HttpRequestParsingException):
+        with self.assertRaises(exceptions.HttpRequestParsingException):
             request = HttpRequest.deserialize(("HTTP/1.1\r\n" "Host 8000\r\n" "\r\n"))
 
 
 class TestHttpResponse(unittest.TestCase):
-    def test_constructing_http_response(self):
+    def test_serializing_http_response_without_body(self):
 
-        response = HttpResponse(200, {"server": "asgi-from-scratch/0.1"})
-        self.assertEqual(response.status, 200)
-        self.assertDictEqual(response.headers, {"server": "asgi-from-scratch/0.1"})
+        expected = b"HTTP/1.0 200 OK\r\n" b"content-type: text/plain\r\n" b"\r\n"
+        response = HttpResponse(200, {"content-type": "text/plain"})
+        self.assertEqual(response.serialize(), expected)
 
-    def test_encoding_http_response_to_bytes(self):
+    def test_serializing_http_response_with_body(self):
 
-        response = HttpResponse(200, {"server": "asgi-from-scratch/0.1"})
-        self.assertEqual(
-            response.serialize(),
-            (b"HTTP/1.0 200 OK\r\n" b"server: asgi-from-scratch/0.1\r\n" b"\r\n"),
-        )
+        # TODO: Implement this
+        pass

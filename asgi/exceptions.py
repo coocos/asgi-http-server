@@ -6,4 +6,4 @@ class HttpRequestParsingException(ValueError):
 
 
 class UnknownAsgiMessageType(Exception):
-    """Raised when protocol server receives an unknown ASGI message type"""
+    """Raised when protocol server receives an unknown ASGI message"""
