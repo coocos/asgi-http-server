@@ -1,5 +1,7 @@
 # asgi-http-server
 
+![CI](https://github.com/coocos/asgi-http-server/workflows/CI/badge.svg)
+
 This repository implements an [ASGI](https://asgi.readthedocs.io/en/latest/index.html) compatible HTTP server from scratch as well as a companion ASGI application. No dependencies are needed as long as you're running Python 3.8 or above. The idea behind this repository is to grok how ASGI works and what is the role of the ASGI protocol server and the ASGI application itself and how they communicate.
 
 ## How it works
