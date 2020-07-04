@@ -68,7 +68,8 @@ class AsgiHttpResponse:
             self.writer.write(response.serialize())
             await self.writer.drain()
         elif message["type"] == "http.response.body":
-            print("Response body not implemented yet")
+            # TODO: more_body needs to be handled for streaming writes
+            self.writer.write(message["body"])
         else:
             raise exceptions.UnknownAsgiMessageType(
                 f"{message['type']} is not a known message type"

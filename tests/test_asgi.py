@@ -115,6 +115,30 @@ class TestAsgiHttpResponse(unittest.TestCase):
             ),
         )
 
-    def test_writing_body(self):
-        # TODO: Implement
-        pass
+    def test_writing_headers_and_body(self):
+        messages = [{
+            "type": "http.response.start",
+            "status": 200,
+            "headers": [
+                [b"content-type", b"application/json"],
+                [b"content-length", b"44"],
+            ],
+        },{
+            "type" : "http.response.body",
+            "body": b'{"first_name":"paul","last_name":"atreides"}',
+            "more_body": False
+        }]
+        writer = StreamWriter()
+        response = AsgiHttpResponse(writer)
+        for message in messages:
+            asyncio.run(response.write(message))
+        self.assertEqual(
+            writer.stream,
+            (
+                b"HTTP/1.0 200 OK\r\n"
+                b"content-type: application/json\r\n"
+                b"content-length: 44\r\n"
+                b"\r\n"
+                b'{"first_name":"paul","last_name":"atreides"}'
+            ),
+        )
