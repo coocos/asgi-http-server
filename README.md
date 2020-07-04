@@ -11,17 +11,17 @@ The [ASGI specification](https://asgi.readthedocs.io/en/latest/index.html) is ra
 
 ```
                     ___________________                 _______________
-                    |                 |  <-- event ---  |             |
+                    |                 |  <-- message ---  |             |
 socket <-- data --> | protocol server |                 | application |
-                    |_________________|  --- event -->  |_____________|
+                    |_________________|  --- message -->  |_____________|
 
 ```
 
 ### Protocol server
 
-The protocol server is responsible for decoding protocol data (for example HTTP) into events defined by the ASGI specification which are then sent to the application. The events themselves are usually simple Python dictionaries. The application can also send ASGI specification compliant events in the other direction, i.e. to the protocol server which then needs to encode those events to conform to whatever protocol it is implementing.
+The protocol server is responsible for decoding protocol data (for example HTTP) into messages defined by the ASGI specification which are then sent to the application. The messages themselves are usually simple Python dictionaries. The application can also send ASGI specification compliant messages in the other direction, i.e. to the protocol server which then needs to encode those messages to conform to whatever protocol it is implementing.
 
-In the context of HTTP this means that the protocol server is more or less a TCP socket server which decodes the HTTP protocol into events defined by the [ASGI specification for HTTP](https://asgi.readthedocs.io/en/latest/specs/www.html#http) which are then passed to the application. The application can also send HTTP responses as events to the protocol server and the protocol server needs to encode those events to match the HTTP protocol.
+In the context of HTTP this means that the protocol server is more or less a TCP socket server which decodes the HTTP protocol into messages defined by the [ASGI specification for HTTP](https://asgi.readthedocs.io/en/latest/specs/www.html#http) which are then passed to the application. The application can also send HTTP responses as messages to the protocol server and the protocol server needs to encode those messages to match the HTTP protocol.
 
 ### Note about protocols
 
@@ -36,15 +36,15 @@ async def application(scope, receive, send):
     ...
 ```
 
-Scope is a dictionary containing relevant information for the current connection and / or request. In the context of HTTP the scope dictionary will contain things like the HTTP method and path but not the body of the HTTP request. `receive` is a coroutine which can be `await`ed for to retrieve the body of the HTTP request and `send` is a coroutine which can be used to send the HTTP response by calling it with ASGI compliant HTTP events.
+Scope is a dictionary containing relevant information for the current connection and / or request. In the context of HTTP the scope dictionary will contain things like the HTTP method and path but not the body of the HTTP request. `receive` is a coroutine which can be `await`ed for to retrieve the body of the HTTP request and `send` is a coroutine which can be used to send the HTTP response by calling it with ASGI compliant HTTP messages.
 
 ### Summary
 
 And that's more or less it. Some details have obviously been omitted but to summarize the whole thing in a few short steps:
 
-- a protocol server decodes protocol traffic into events / dictionaries defined by the relevant protocol specification
-- the application coroutine consumes those events and sends back events of its own
-- the protocol server will encode the events sent by the application according to the protocol it implements
+- a protocol server decodes protocol traffic into events / messages defined by the relevant protocol specification
+- the application coroutine consumes those messages and sends back messages of its own
+- the protocol server will encode the messages sent by the application according to the protocol it implements
 
 ## Limitations
 
