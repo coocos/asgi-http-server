@@ -4,6 +4,10 @@
 
 This repository implements an [ASGI](https://asgi.readthedocs.io/en/latest/index.html) compatible HTTP server from scratch as well as a companion ASGI application. No dependencies are needed as long as you're running Python 3.8 or above. The idea behind this repository is to grok how ASGI works and what is the role of the ASGI protocol server and the ASGI application itself and how they communicate.
 
+## Limitations
+
+Note that the HTTP server is very, very barebones and is only meant to serve as a teaching tool for understanding ASGI - nothing more. Nothing included in this repository is meant to be run in production. The HTTP request parsing is neither robust nor safe, the connection handling is inadequate, the protocol server probably does not fully implement the ASGI specication for HTTP and there's most likely a bug or two.
+
 ## How it works
 
 The [ASGI specification](https://asgi.readthedocs.io/en/latest/index.html) is rather short so I'd suggest reading through it if you're interested but what follows is a minimalistic summary of it. A typical ASGI application can essentially be split into two components:
@@ -47,10 +51,6 @@ And that's more or less it. Some details have obviously been omitted but to summ
 - a protocol server decodes protocol traffic into events / messages defined by the relevant protocol specification
 - the application coroutine consumes those messages and sends back messages of its own
 - the protocol server will encode the messages sent by the application according to the protocol it implements
-
-## Limitations
-
-Note that the HTTP server is very, very barebones and is only meant to serve as a teaching tool for understanding ASGI - nothing more. Nothing included in this repository is meant to be run in production. The HTTP request parsing is neither robust nor safe, the connection handling is inadequate and the protocol server probably does not fully implement the ASGI specication for HTTP.
 
 ## Usage
 
