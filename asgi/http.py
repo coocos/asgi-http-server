@@ -21,7 +21,7 @@ class AsgiHttpRequest:
         # Read until all headers have been read
         while not b"\r\n\r\n" in self.buffer:
             self.buffer += await self.reader.read(64)
-        request = HttpRequest.deserialize(self.buffer.decode("utf-8"))
+        request = HttpRequest.deserialize(self.buffer)
         return {
             "type": "http",
             "asgi": {"version": "3.0", "spec_version": "2.0",},
@@ -40,14 +40,14 @@ class AsgiHttpRequest:
     async def read(self) -> Dict:
         """Returns ASGI message with HTTP request contents"""
         # Read body if it's present
-        request = HttpRequest.deserialize(self.buffer.decode("utf-8"))
+        request = HttpRequest.deserialize(self.buffer)
         if "content-length" in request.headers:
             body_start = self.buffer.find(b"\r\n\r\n") + 4
             while len(self.buffer[body_start:]) < int(
                 request.headers["content-length"]
             ):
                 self.buffer += await self.reader.read(64)
-        request = HttpRequest.deserialize(self.buffer.decode("utf-8"))
+        request = HttpRequest.deserialize(self.buffer)
         return {"type": "http.request", "body": request.body, "more_body": False}
 
 
@@ -94,23 +94,26 @@ class HttpRequest:
     # FIXME: Create a proper URL object?
     path: str
     headers: Dict[str, str]
-    body: str = ""
+    body: bytes = b""
 
     @classmethod
-    def deserialize(cls, raw: str) -> HttpRequest:
+    def deserialize(cls, data: bytes) -> HttpRequest:
         """Constructs HttpRequest from string containing an entire HTTP request"""
         try:
+            raw = data.decode("utf-8")
             raw_headers, raw_body = raw.split("\r\n\r\n")
             header_lines = raw_headers.split("\r\n")
             method, path, protocol = header_lines[0].split()
             headers = HttpRequest._parse_headers(header_lines[1:])
             if "content-length" in headers:
-                body = HttpRequest._parse_body(raw_body)
+                body = raw_body.encode("utf-8")
             else:
-                body = ""
+                body = b""
             return HttpRequest(method, path, headers, body)
         except Exception as err:
-            raise exceptions.HttpRequestParsingException(f"Failed to parse {raw}")
+            raise exceptions.HttpRequestParsingException(
+                f"Failed to parse {data.decode('utf-8')}"
+            )
 
     @staticmethod
     def _parse_headers(raw_headers: List[str]) -> Dict[str, str]:
@@ -122,12 +125,6 @@ class HttpRequest:
             headers[name.lower()] = value
 
         return headers
-
-    @staticmethod
-    def _parse_body(body: str) -> str:
-        """Parses body"""
-        # TODO: Implement JSON parsing
-        return body
 
 
 @dataclass

@@ -9,11 +9,11 @@ class TestHttpRequest(unittest.TestCase):
 
         request = HttpRequest.deserialize(
             (
-                "GET / HTTP/1.0\r\n"
-                "User-Agent: curl/7.54.0\r\n"
-                "Host: localhost:8000\r\n"
-                "Accept: */*\r\n"
-                "\r\n"
+                b"GET / HTTP/1.0\r\n"
+                b"User-Agent: curl/7.54.0\r\n"
+                b"Host: localhost:8000\r\n"
+                b"Accept: */*\r\n"
+                b"\r\n"
             )
         )
         self.assertEqual(request.method, "GET")
@@ -26,14 +26,14 @@ class TestHttpRequest(unittest.TestCase):
     def test_deserializing_http_request_with_body(self):
         request = HttpRequest.deserialize(
             (
-                "POST / HTTP/1.0\r\n"
-                "User-Agent: curl/7.54.0\r\n"
-                "Host: localhost:8000\r\n"
-                "Content-Type: application/json\r\n"
-                "Accept: */*\r\n"
-                "Content-Length: 47\r\n"
-                "\r\n"
-                '{"first_name": "Paul", "last_name": "Atreides"}'
+                b"POST / HTTP/1.0\r\n"
+                b"User-Agent: curl/7.54.0\r\n"
+                b"Host: localhost:8000\r\n"
+                b"Content-Type: application/json\r\n"
+                b"Accept: */*\r\n"
+                b"Content-Length: 47\r\n"
+                b"\r\n"
+                b'{"first_name": "Paul", "last_name": "Atreides"}'
             )
         )
         self.assertEqual(request.method, "POST")
@@ -49,13 +49,13 @@ class TestHttpRequest(unittest.TestCase):
             },
         )
         self.assertEqual(
-            request.body, '{"first_name": "Paul", "last_name": "Atreides"}'
+            request.body, b'{"first_name": "Paul", "last_name": "Atreides"}'
         )
 
     def test_that_parsing_invalid_request_raises_exception(self):
 
         with self.assertRaises(exceptions.HttpRequestParsingException):
-            request = HttpRequest.deserialize(("HTTP/1.0\r\n" "Host 8000\r\n" "\r\n"))
+            request = HttpRequest.deserialize((b"HTTP/1.0\r\nHost 8000\r\n\r\n"))
 
 
 class TestHttpResponse(unittest.TestCase):

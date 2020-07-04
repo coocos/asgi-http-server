@@ -86,7 +86,7 @@ class TestAsgiHttpRequest(unittest.TestCase):
             scope,
             {
                 "type": "http.request",
-                "body": '{"first_name":"paul","last_name":"atreides"}',
+                "body": b'{"first_name":"paul","last_name":"atreides"}',
                 "more_body": False,
             },
         )
