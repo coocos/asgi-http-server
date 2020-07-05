@@ -16,9 +16,9 @@ The [ASGI specification](https://asgi.readthedocs.io/en/latest/index.html) is ra
 * an application
 
 ```
-                    ___________________                 _______________
+                    ___________________                   _______________
                     |                 |  <-- message ---  |             |
-socket <-- data --> | protocol server |                 | application |
+socket <-- data --> | protocol server |                   | application |
                     |_________________|  --- message -->  |_____________|
 
 ```
