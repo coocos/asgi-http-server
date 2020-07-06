@@ -6,7 +6,7 @@ This repository implements an [ASGI](https://asgi.readthedocs.io/en/latest/index
 
 ## Limitations
 
-Note that the HTTP server is very, very barebones and is only meant to serve as a teaching tool for understanding ASGI - nothing more. Nothing included in this repository is meant to be run in production. The HTTP request parsing is neither robust nor safe, the connection handling is inadequate, the protocol server probably does not fully implement the ASGI specication for HTTP and there's most likely a bug or two.
+Note that the HTTP server is very, very barebones and is only meant to serve as a teaching tool for understanding ASGI - nothing more. Nothing included in this repository is meant to be run in production. The HTTP request parsing is neither robust nor safe, the connection handling is inadequate, the protocol server does not _fully_ implement the ASGI specication for HTTP (for example streaming HTTP responses using `more_body` is not supported) and there's most likely a bug or two.
 
 ## How it works
 
@@ -31,7 +31,7 @@ In the context of HTTP this means that the protocol server is more or less a TCP
 
 ### Note about protocols
 
-Note that each protocol has their own protocol specific ASGI specification. The main ASGI specification itself is concerned with this split between the protocol server and the application, not the specific events defined for a common protocol. In this repository the HTTP protocol server is defined in the [server](./asgi/server.py) module as well as the [http](./asgi/http.py) module.
+Note that each protocol has their own protocol specific ASGI specification. The main ASGI specification itself is concerned with this split between the protocol server and the application, not the specific events defined for a common protocol. In this repository the HTTP protocol server is defined in the [server](./asgi/server.py) module.
 
 ### Application
 
@@ -59,6 +59,8 @@ To run the protocol server:
 ```shell
 python3 -m asgi.server asgi.example:app
 ```
+
+You can now navigate your browser to `localhost:8000` and you should see a simple HTML page.
 
 To run tests:
 

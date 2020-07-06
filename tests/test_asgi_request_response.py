@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 
-from asgi.http import HttpRequest, HttpResponse, AsgiHttpRequest, AsgiHttpResponse
+from asgi.stream import AsgiHttpRequest, AsgiHttpResponse
 from fakes import StreamReader, StreamWriter
 
 

@@ -64,8 +64,3 @@ class TestHttpResponse(unittest.TestCase):
         expected = b"HTTP/1.0 200 OK\r\n" b"content-type: text/plain\r\n" b"\r\n"
         response = HttpResponse(200, {"content-type": "text/plain"})
         self.assertEqual(response.serialize(), expected)
-
-    def test_serializing_http_response_with_body(self):
-
-        # TODO: Implement this
-        pass

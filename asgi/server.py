@@ -2,7 +2,7 @@
 import asyncio
 import importlib
 
-from asgi.http import AsgiHttpRequest, AsgiHttpResponse
+from asgi.stream import AsgiHttpRequest, AsgiHttpResponse
 from asgi import cli
 
 
