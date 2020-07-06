@@ -1,12 +1,17 @@
 """ASGI protocol server for HTTP 1.0"""
 import asyncio
 import importlib
+from typing import Callable, Awaitable, Dict
 
 from asgi.stream import AsgiHttpRequest, AsgiHttpResponse
 from asgi import cli
 
+AsgiApplication = Callable[[Dict, Callable, Callable], Awaitable]
 
-def use_application(app):
+
+def use_application(
+    app: AsgiApplication,
+) -> Callable[[asyncio.streams.StreamReader, asyncio.streams.StreamWriter], Awaitable]:
     """Uses passed ASGI application to handle HTTP requests"""
 
     async def handle_request(
@@ -23,7 +28,7 @@ def use_application(app):
     return handle_request
 
 
-def import_application(path: str):
+def import_application(path: str) -> AsgiApplication:
     """Imports ASGI application coroutine and returns it"""
     module_path, app_name = path.split(":")
     module = importlib.import_module(module_path)
