@@ -6,7 +6,7 @@ This repository implements an [ASGI](https://asgi.readthedocs.io/en/latest/index
 
 ## Limitations
 
-Note that the HTTP server is very, very barebones and is only meant to serve as a teaching tool for understanding ASGI - nothing more. Nothing included in this repository is meant to be run in production. The HTTP request parsing is neither robust nor safe, the connection handling is inadequate, the protocol server does not _fully_ implement the ASGI specication for HTTP (for example streaming HTTP responses using `more_body` is not supported) and there's most likely a bug or two.
+Note that the HTTP server is very, very barebones and is only meant to serve as a teaching tool for understanding ASGI - nothing more. Nothing included in this repository is meant to be run in production. The HTTP request parsing is neither robust nor safe, the connection handling is inadequate, the protocol server does not _fully_ implement the ASGI specification for HTTP (for example streaming HTTP responses using `more_body` is missing) and there's most likely a bug or two.
 
 ## How it works
 
